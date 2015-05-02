@@ -49,9 +49,10 @@ type turnSource struct {
 	list *Turn
 }
 
-// NewTurnSource creates a new source of I/O computations whose completions run on a turn runner.
-func NewTurnSource(runner async.Runner) async.Source {
-	manager := runner.(*turnRunner).manager
+// NewTurnSource creates a new source of I/O computations whose completions run on the ambient
+// (default) runner.
+func NewTurnSource() async.Source {
+	manager := async.GetCurrentRunner().(*turnRunner).manager
 	t := &turnSource{
 		manager: manager,
 		name:    "turnSource" + manager.NewID().String(),

@@ -37,7 +37,7 @@ func NewTurnRunner(manager *Manager) async.Runner {
 
 // New implements async.Runner.New().
 func (t *turnRunner) New(f async.Func) async.R {
-	r, s := async.NewR(t)
+	r, s := async.NewR()
 	t.manager.NewTurn("New"+t.manager.NewID().String(), func() {
 		next := f()
 		s.Forward(next)

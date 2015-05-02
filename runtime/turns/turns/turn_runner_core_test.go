@@ -38,11 +38,13 @@ func TestTurnRunnerCoreSuite(t *testing.T) {
 func (t *TurnRunnerCoreSuite) OneTurn() {
 	manager := NewManager(NewUniqueIDGenerator())
 	runner := NewTurnRunner(manager)
+	tlsRelease := async.SetAmbientRunner(runner)
+	defer tlsRelease()
 
 	done := make(chan struct{}, 0)
-	runner.New(func() async.R {
+	async.New(func() async.R {
 		close(done)
-		return runner.Done()
+		return async.Done()
 	})
 	manager.runOneLoop()
 	<-done
@@ -52,8 +54,10 @@ func (t *TurnRunnerCoreSuite) Done() {
 	log.Infof("Running test %s", base.GetMethodName())
 	manager := NewManager(NewUniqueIDGenerator())
 	runner := NewTurnRunner(manager)
+	tlsRelease := async.SetAmbientRunner(runner)
+	defer tlsRelease()
 
-	done := runner.Done()
+	done := async.Done()
 	s := async.InternalUseOnlyGetResolver(done.ResultT).(*turnResolver)
 	if !s.isResolved() {
 		t.Errorf("Expected Done() to be resolved.  Got: %v, Want: resolved", done)

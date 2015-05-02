@@ -15,10 +15,6 @@
 
 package async
 
-// Func is a function that initiates a new computation.  It returns an associated result that is
-// resolved when the new computation has completed.
-type Func func() R
-
 // Runner abstracts the ability to execute asynchronous computation.  Each computation is
 // associated with a result that can be used to monitor its completion.
 type Runner interface {

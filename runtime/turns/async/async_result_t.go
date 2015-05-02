@@ -34,6 +34,11 @@ func NewResultT(s ResolverT) ResultT {
 	return ResultT{s}
 }
 
+// NewBase creates a new unassociated untyped result and its resolver.
+func NewBase() (ResultT, ResolverT) {
+	return GetCurrentRunner().NewResultT()
+}
+
 // Base provides access to the base ResultT object for subtypes.  This method is intended to be
 // inherited by subtypes that implement the AwaitableT interface.
 func (r ResultT) Base() ResultT {

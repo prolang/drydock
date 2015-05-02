@@ -38,21 +38,21 @@ func (StringR) Type() reflect.Type {
 }
 
 // NewStringR allocates a new result.
-func NewStringR(runner Runner) (StringR, StringS) {
-	r, s := runner.NewResultT()
+func NewStringR() (StringR, StringS) {
+	r, s := NewBase()
 	return StringR{r}, StringS{s}
 }
 
 // NewStringError returns an unassociated already failed result.
-func NewStringError(runner Runner, err error) StringR {
-	r, s := NewStringR(runner)
+func NewStringError(err error) StringR {
+	r, s := NewStringR()
 	s.Fail(err)
 	return r
 }
 
 // NewStringErrorf returns an unassociated already failed result.
-func NewStringErrorf(runner Runner, format string, a ...interface{}) StringR {
-	return NewStringError(runner, fmt.Errorf(format, a...))
+func NewStringErrorf(format string, a ...interface{}) StringR {
+	return NewStringError(fmt.Errorf(format, a...))
 }
 
 // WhenString implements When.  See async.When().

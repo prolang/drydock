@@ -35,8 +35,8 @@ func TestTurnSourceSuite(t *testing.T) {
 
 // AsyncTurn verifies that a parallel turn executed by a Source does run, and that its resolution is
 // reflected correctly on the main turn queue.
-func (t *TurnSourceSuite) AsyncTurn(runner async.Runner) async.R {
-	src := turns.NewTurnSource(runner)
+func (t *TurnSourceSuite) AsyncTurn() async.R {
+	src := turns.NewTurnSource()
 
 	syncPoint1 := make(chan struct{}, 0)
 	syncPoint2 := make(chan struct{}, 0)
@@ -55,14 +55,14 @@ func (t *TurnSourceSuite) AsyncTurn(runner async.Runner) async.R {
 	})
 
 	// Create a coop-turn to provide the sync point.
-	runner.New(func() async.R {
+	async.New(func() async.R {
 		t.Infof("Beginning coop turn that provides sync point.")
 		// Wait for both parallel and coop turns to have started.
 		<-syncPoint1
 
 		// Completed the parallel turn.
 		close(syncPoint2)
-		return runner.Done()
+		return async.Done()
 	})
 
 	// Cleanup the source.

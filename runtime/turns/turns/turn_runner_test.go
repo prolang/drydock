@@ -33,33 +33,33 @@ func TestTurnRunnerSuite(t *testing.T) {
 	test.RunSuite(t, new(TurnRunnerSuite))
 }
 
-func (t *TurnRunnerSuite) Done(runner async.Runner) async.R {
-	return runner.Done()
+func (t *TurnRunnerSuite) Done() async.R {
+	return async.Done()
 }
 
-func (t *TurnRunnerSuite) DoneWhen(runner async.Runner) async.R {
-	done := runner.Done()
+func (t *TurnRunnerSuite) DoneWhen() async.R {
+	done := async.Done()
 	return async.When(done, func(err error) async.R {
 		if err != nil {
 			t.Errorf("Expected Done() to succeeed.  Got: %v, Want: nil", err)
 		}
 
-		return runner.Done()
+		return async.Done()
 	})
 }
 
-func (t *TurnRunnerSuite) NewResultSuccess(runner async.Runner) async.R {
-	r, s := async.NewR(runner)
-	async.When(runner.Done(), func() {
+func (t *TurnRunnerSuite) NewResultSuccess() async.R {
+	r, s := async.NewR()
+	async.When(async.Done(), func() {
 		s.Complete()
 	})
 	return r
 }
 
-func (t *TurnRunnerSuite) NewResultError(runner async.Runner) async.R {
+func (t *TurnRunnerSuite) NewResultError() async.R {
 	expected := fmt.Errorf("some error")
-	r, s := async.NewR(runner)
-	async.When(runner.Done(), func() {
+	r, s := async.NewR()
+	async.When(async.Done(), func() {
 		s.Fail(expected)
 	})
 	return async.When(r, func(err error) error {
@@ -71,14 +71,14 @@ func (t *TurnRunnerSuite) NewResultError(runner async.Runner) async.R {
 }
 
 // ResolveCoverage tests Resolver.Resolve().
-func (t *TurnRunnerSuite) ResolveCoverage(runner async.Runner) async.R {
-	r, s := async.NewR(runner)
-	async.When(runner.Done(), func() {
+func (t *TurnRunnerSuite) ResolveCoverage() async.R {
+	r, s := async.NewR()
+	async.When(async.Done(), func() {
 		s.Resolve(nil)
 	})
 
 	expected := fmt.Errorf("some error")
-	r2, s2 := async.NewR(runner)
+	r2, s2 := async.NewR()
 	async.When(r, func() {
 		s2.Resolve(expected)
 	})
@@ -91,11 +91,11 @@ func (t *TurnRunnerSuite) ResolveCoverage(runner async.Runner) async.R {
 }
 
 // NewResultForward tests Resolver.Forward().
-func (t *TurnRunnerSuite) NewResultForward(runner async.Runner) async.R {
+func (t *TurnRunnerSuite) NewResultForward() async.R {
 	expected := fmt.Errorf("some error")
-	r, s := async.NewR(runner)
-	async.When(runner.Done(), func() {
-		s.Forward(async.NewError(runner, expected))
+	r, s := async.NewR()
+	async.When(async.Done(), func() {
+		s.Forward(async.NewError(expected))
 	})
 	return async.When(r, func(err error) error {
 		if err != expected {
@@ -106,8 +106,8 @@ func (t *TurnRunnerSuite) NewResultForward(runner async.Runner) async.R {
 }
 
 // NewErrorfCoverage tests Runner.Errorf().
-func (t *TurnRunnerSuite) NewErrorfCoverage(runner async.Runner) async.R {
-	e := async.NewErrorf(runner, "some %s %d", "error", 1)
+func (t *TurnRunnerSuite) NewErrorfCoverage() async.R {
+	e := async.NewErrorf("some %s %d", "error", 1)
 	return async.When(e, func(err error) error {
 		if err.Error() != "some error 1" {
 			return fmt.Errorf("Got: %v, Want: %v", err, "some error 1")
@@ -117,12 +117,12 @@ func (t *TurnRunnerSuite) NewErrorfCoverage(runner async.Runner) async.R {
 }
 
 // NewResultForwarded tests a When on a forwarded result resolves correctly.
-func (t *TurnRunnerSuite) NewResultForwarded(runner async.Runner) async.R {
+func (t *TurnRunnerSuite) NewResultForwarded() async.R {
 	expected := fmt.Errorf("some error")
-	r, s := async.NewR(runner)
+	r, s := async.NewR()
 
 	// Forward the result synchronously causing the When to be directly enqueued on the error.
-	s.Forward(async.NewError(runner, expected))
+	s.Forward(async.NewError(expected))
 
 	return async.When(r, func(err error) error {
 		if err != expected {

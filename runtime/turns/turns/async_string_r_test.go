@@ -34,9 +34,9 @@ func TestStringRSuite(t *testing.T) {
 }
 
 // NewCoverage provides coverage for the New function.
-func (t *StringRSuite) NewCoverage(runner async.Runner) async.R {
+func (t *StringRSuite) NewCoverage() async.R {
 	expected := "a test string"
-	r, s := async.NewStringR(runner)
+	r, s := async.NewStringR()
 	s.Complete(expected)
 	return async.When(r, func(val string, err error) error {
 		if err != nil {
@@ -50,9 +50,9 @@ func (t *StringRSuite) NewCoverage(runner async.Runner) async.R {
 }
 
 // NewErrorfCoverage provides coverage for the NewErrorf function.
-func (t *StringRSuite) NewErrorfCoverage(runner async.Runner) async.R {
+func (t *StringRSuite) NewErrorfCoverage() async.R {
 	expected := fmt.Errorf("some error")
-	r := async.NewStringErrorf(runner, "%v", expected)
+	r := async.NewStringErrorf("%v", expected)
 	return async.When(r, func(err error) error {
 		if err.Error() != expected.Error() {
 			return fmt.Errorf("Expected error.  Got: %v, Want: %v", err, expected)
@@ -62,10 +62,10 @@ func (t *StringRSuite) NewErrorfCoverage(runner async.Runner) async.R {
 }
 
 // WhenCoverage provides coverage for the When function.
-func (t *StringRSuite) WhenCoverage(runner async.Runner) async.R {
+func (t *StringRSuite) WhenCoverage() async.R {
 	expected := "a test string"
-	w := async.WhenString(runner.Done(), func() async.StringR {
-		r, s := async.NewStringR(runner)
+	w := async.WhenString(async.Done(), func() async.StringR {
+		r, s := async.NewStringR()
 		s.Complete(expected)
 		return r
 	})
@@ -83,10 +83,10 @@ func (t *StringRSuite) WhenCoverage(runner async.Runner) async.R {
 }
 
 // FinallyCoverage provides coverage for the Finally function.
-func (t *StringRSuite) FinallyCoverage(runner async.Runner) async.R {
+func (t *StringRSuite) FinallyCoverage() async.R {
 	expected := "a test string"
 	didRun := false
-	r, s := async.NewStringR(runner)
+	r, s := async.NewStringR()
 	s.Complete(expected)
 	w := async.FinallyString(r, func() {
 		didRun = true
@@ -108,10 +108,10 @@ func (t *StringRSuite) FinallyCoverage(runner async.Runner) async.R {
 }
 
 // ResolveCoverage provides coverage for the Resolve function.
-func (t *StringRSuite) ResolveCoverage(runner async.Runner) async.R {
+func (t *StringRSuite) ResolveCoverage() async.R {
 	expected := "a test string"
-	w := async.WhenString(runner.Done(), func() async.StringR {
-		r, s := async.NewStringR(runner)
+	w := async.WhenString(async.Done(), func() async.StringR {
+		r, s := async.NewStringR()
 		s.Resolve(expected, nil)
 		return r
 	})
@@ -129,14 +129,14 @@ func (t *StringRSuite) ResolveCoverage(runner async.Runner) async.R {
 }
 
 // ForwardCoverage provides coverage for the Forward function.
-func (t *StringRSuite) ForwardCoverage(runner async.Runner) async.R {
+func (t *StringRSuite) ForwardCoverage() async.R {
 	expected := "a test string"
-	resolved, s0 := async.NewStringR(runner)
+	resolved, s0 := async.NewStringR()
 	s0.Complete(expected)
 
 	// Instead of resolving the return result, forward it to an already resolved value.
-	w := async.WhenString(runner.Done(), func() async.StringR {
-		r, s := async.NewStringR(runner)
+	w := async.WhenString(async.Done(), func() async.StringR {
+		r, s := async.NewStringR()
 		s.Forward(resolved)
 		return r
 	})

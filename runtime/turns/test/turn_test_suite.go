@@ -48,10 +48,7 @@ func filterTurnTests(m reflect.Method) bool {
 	}
 
 	// Asynchronous test method are allowed.
-	if m.Type.NumIn() != 2 || m.Type.NumOut() != 1 {
-		return false
-	}
-	if m.Type.In(1) != asyncRunnerType {
+	if m.Type.NumIn() != 1 || m.Type.NumOut() != 1 {
 		return false
 	}
 	if m.Type.Out(0) != asyncResultType {
@@ -61,13 +58,9 @@ func filterTurnTests(m reflect.Method) bool {
 	return true
 }
 
-// asyncTestFunc defines the signature of an asynchronous test method.
-type asyncTestFunc func(async.Runner) async.R
-
 // A set of reflect.Type constants for use in structural validations.
 var (
-	asyncTestFuncType = reflect.TypeOf((*asyncTestFunc)(nil)).Elem()
-	asyncRunnerType   = reflect.TypeOf((*async.Runner)(nil)).Elem()
+	asyncTestFuncType = reflect.TypeOf((*async.Func)(nil)).Elem()
 	asyncResultType   = reflect.TypeOf((*async.R)(nil)).Elem()
 )
 
@@ -91,7 +84,7 @@ func dispatchTurnTests(s *test.Suite, v reflect.Value, f reflect.Value) {
 		return f.Call(inputs)
 	})
 
-	err := actor.RunActor(fn.Interface().(asyncTestFunc))
+	err := actor.RunActor(fn.Interface().(async.Func))
 	if err != nil {
 		s.Errorf("Expected test case retval to succeed.  Got: %q, Want: nil", err)
 	}

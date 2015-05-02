@@ -34,33 +34,33 @@ func TestRSuite(t *testing.T) {
 }
 
 // NewCoverage provides coverage for the New function.
-func (t *RSuite) NewCoverage(runner async.Runner) async.R {
-	r, s := async.NewR(runner)
+func (t *RSuite) NewCoverage() async.R {
+	r, s := async.NewR()
 	s.Complete()
 	return async.When(r, func(val interface{}, err error) async.R {
 		if err != nil {
-			return async.NewErrorf(runner, "Expected successful completion.  Got: %v, Want: nil", err)
+			return async.NewErrorf("Expected successful completion.  Got: %v, Want: nil", err)
 		}
-		return runner.Done()
+		return async.Done()
 	})
 }
 
 // NewErrorfCoverage provides coverage for the NewErrorf function.
-func (t *RSuite) NewErrorfCoverage(runner async.Runner) async.R {
+func (t *RSuite) NewErrorfCoverage() async.R {
 	expected := fmt.Errorf("some error")
-	r := async.NewErrorf(runner, "%v", expected)
+	r := async.NewErrorf("%v", expected)
 	return async.When(r, func(val interface{}, err error) async.R {
 		if err.Error() != expected.Error() {
-			return async.NewErrorf(runner, "Expected error.  Got: %v, Want: %v", err, expected)
+			return async.NewErrorf("Expected error.  Got: %v, Want: %v", err, expected)
 		}
-		return runner.Done()
+		return async.Done()
 	})
 }
 
 // WhenCoverage provides coverage for the When function.
-func (t *RSuite) WhenCoverage(runner async.Runner) async.R {
-	w := async.When(runner.Done(), func(val interface{}, err error) async.R {
-		r, s := async.NewR(runner)
+func (t *RSuite) WhenCoverage() async.R {
+	w := async.When(async.Done(), func(val interface{}, err error) async.R {
+		r, s := async.NewR()
 		s.Complete()
 		return r
 	})
@@ -69,10 +69,10 @@ func (t *RSuite) WhenCoverage(runner async.Runner) async.R {
 	expected := interface{}(nil)
 	w1 := async.When(w, func(val interface{}, err error) async.R {
 		if err != nil {
-			return async.NewErrorf(runner, "Expected success w1.  Got: %v, Want: nil", err)
+			return async.NewErrorf("Expected success w1.  Got: %v, Want: nil", err)
 		}
 		if val != expected {
-			return async.NewErrorf(runner, "Expected value w1.  Got: %v, Want: %v", val, expected)
+			return async.NewErrorf("Expected value w1.  Got: %v, Want: %v", val, expected)
 		}
 		return w
 	})
@@ -80,7 +80,7 @@ func (t *RSuite) WhenCoverage(runner async.Runner) async.R {
 	// Verify just error.
 	w2 := async.When(w1, func(err error) async.R {
 		if err != nil {
-			return async.NewErrorf(runner, "Expected success w2.  Got: %v, Want: nil", err)
+			return async.NewErrorf("Expected success w2.  Got: %v, Want: nil", err)
 		}
 		return w1
 	})
@@ -88,7 +88,7 @@ func (t *RSuite) WhenCoverage(runner async.Runner) async.R {
 	// Verify just value.
 	w3 := async.When(w2, func(val interface{}) async.R {
 		if val != expected {
-			return async.NewErrorf(runner, "Expected value w3.  Got: %v, Want: %v", val, expected)
+			return async.NewErrorf("Expected value w3.  Got: %v, Want: %v", val, expected)
 		}
 		return w2
 	})
@@ -101,53 +101,53 @@ func (t *RSuite) WhenCoverage(runner async.Runner) async.R {
 	})
 	return async.When(w4, func() async.R {
 		if !didRun {
-			return async.NewErrorf(runner, "Expected executed w4.  Got: %v, Want: true", didRun)
+			return async.NewErrorf("Expected executed w4.  Got: %v, Want: true", didRun)
 		}
 		return w4
 	})
 }
 
 // WhenErrorCoverage provides coverage for the When function.
-func (t *RSuite) WhenErrorCoverage(runner async.Runner) async.R {
+func (t *RSuite) WhenErrorCoverage() async.R {
 	expected := fmt.Errorf("some error")
-	w := async.When(runner.Done(), func() async.R {
-		r, s := async.NewR(runner)
+	w := async.When(async.Done(), func() async.R {
+		r, s := async.NewR()
 		s.Fail(expected)
 		return r
 	})
 
 	w1 := async.When(w, func(_ interface{}, err error) async.R {
 		if err != expected {
-			return async.NewErrorf(runner, "Expected executed w.  Got: %v, Want: %v", err, expected)
+			return async.NewErrorf("Expected executed w.  Got: %v, Want: %v", err, expected)
 		}
 		return w
 	})
 
 	w2 := async.When(w1, func(interface{}) async.R {
-		return async.NewErrorf(runner, "Expected not executed w1")
+		return async.NewErrorf("Expected not executed w1")
 	})
 	w3 := async.When(w2, func(_ interface{}, err error) async.R {
 		if err != expected {
-			return async.NewErrorf(runner, "Expected executed w.  Got: %v, Want: %v", err, expected)
+			return async.NewErrorf("Expected executed w.  Got: %v, Want: %v", err, expected)
 		}
 		return w2
 	})
 
 	w4 := async.When(w3, func() async.R {
-		return async.NewErrorf(runner, "Expected not executed w3")
+		return async.NewErrorf("Expected not executed w3")
 	})
 	return async.When(w4, func(_ interface{}, err error) async.R {
 		if err != expected {
-			return async.NewErrorf(runner, "Expected executed w.  Got: %v, Want: %v", err, expected)
+			return async.NewErrorf("Expected executed w.  Got: %v, Want: %v", err, expected)
 		}
-		return runner.Done()
+		return async.Done()
 	})
 }
 
 // WhenReturnCoverage provides coverage for the When function.
-func (t *RSuite) WhenReturnCoverage(runner async.Runner) async.R {
-	w := async.When(runner.Done(), func() async.R {
-		r, s := async.NewR(runner)
+func (t *RSuite) WhenReturnCoverage() async.R {
+	w := async.When(async.Done(), func() async.R {
+		r, s := async.NewR()
 		s.Complete()
 		return r
 	})
@@ -171,10 +171,10 @@ func (t *RSuite) WhenReturnCoverage(runner async.Runner) async.R {
 }
 
 // WhenErrorReturnCoverage provides coverage for the When function.
-func (t *RSuite) WhenErrorReturnCoverage(runner async.Runner) async.R {
+func (t *RSuite) WhenErrorReturnCoverage() async.R {
 	expected := fmt.Errorf("some error")
-	w := async.When(runner.Done(), func() async.R {
-		r, s := async.NewR(runner)
+	w := async.When(async.Done(), func() async.R {
+		r, s := async.NewR()
 		s.Fail(expected)
 		return r
 	})
@@ -195,17 +195,17 @@ func (t *RSuite) WhenErrorReturnCoverage(runner async.Runner) async.R {
 
 	return async.When(w2, func(err error) async.R {
 		if err != expected {
-			return async.NewErrorf(runner, "Expected executed w2.  Got: %v, Want: %v", err, expected)
+			return async.NewErrorf("Expected executed w2.  Got: %v, Want: %v", err, expected)
 		}
-		return runner.Done()
+		return async.Done()
 	})
 }
 
 // FinallyCoverage provides coverage for the Finally function.
-func (t *RSuite) FinallyCoverage(runner async.Runner) async.R {
+func (t *RSuite) FinallyCoverage() async.R {
 	expected := fmt.Errorf("some error")
 	didRun := false
-	r, s := async.NewR(runner)
+	r, s := async.NewR()
 	s.Fail(expected)
 	w := async.Finally(r, func() {
 		didRun = true
@@ -214,14 +214,14 @@ func (t *RSuite) FinallyCoverage(runner async.Runner) async.R {
 	// Verify that the value was round-tripped.
 	return async.When(w, func(val interface{}, err error) async.R {
 		if !didRun {
-			return async.NewErrorf(runner, "Expected finally to run.  Got: false, Want: true")
+			return async.NewErrorf("Expected finally to run.  Got: false, Want: true")
 		}
 		if err != expected {
-			return async.NewErrorf(runner, "Expected error.  Got: %v, Want: %v", err, expected)
+			return async.NewErrorf("Expected error.  Got: %v, Want: %v", err, expected)
 		}
 		if val != nil {
-			return async.NewErrorf(runner, "Expected error.  Got: %v, Want: nil", val)
+			return async.NewErrorf("Expected error.  Got: %v, Want: nil", val)
 		}
-		return runner.Done()
+		return async.Done()
 	})
 }

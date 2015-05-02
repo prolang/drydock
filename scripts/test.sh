@@ -10,4 +10,4 @@ ROOT=$(
 
 export GOPATH=${ROOT}:${ROOT}/Godeps/_workspace
 
-go test ./...
+go test ./... $*

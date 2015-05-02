@@ -35,29 +35,20 @@ func TestTurnSuiteSuite(t *testing.T) {
 func (t *TurnSuiteSuite) VerifySyncMethodsAllowed() {
 }
 
-func (t *TurnSuiteSuite) VerifyAsyncMethodsAllowed(runner async.Runner) async.R {
-	return runner.Done()
+func (t *TurnSuiteSuite) VerifyAsyncMethodsAllowed() async.R {
+	return async.Done()
 }
 
 func (t *TurnSuiteSuite) verifyPrivateMethodsSkipped() {
 	t.Fatalf("This should never run.")
 }
 
-func (t *TurnSuiteSuite) VerifyMethodsWrongSignatureSkipped1(runner async.Runner) {
-	t.Fatalf("This should never run.")
-}
-
-func (t *TurnSuiteSuite) VerifyMethodsWrongSignatureSkipped2() async.R {
+func (t *TurnSuiteSuite) VerifyMethodsWrongSignatureSkipped1(notRunner int) async.R {
 	t.Fatalf("This should never run.")
 	return async.R{}
 }
 
-func (t *TurnSuiteSuite) VerifyMethodsWrongSignatureSkipped3(notRunner int) async.R {
-	t.Fatalf("This should never run.")
-	return async.R{}
-}
-
-func (t *TurnSuiteSuite) VerifyMethodsWrongSignatureSkipped4(runner async.Runner) int {
+func (t *TurnSuiteSuite) VerifyMethodsWrongSignatureSkipped2() int {
 	t.Fatalf("This should never run.")
 	return 0
 }

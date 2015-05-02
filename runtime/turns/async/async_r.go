@@ -29,9 +29,9 @@ package async
 // The most basic way to start an asynchronous computation is directly from the current Actor's
 // Runner:
 //
-//   r := runner.New(func() async.R {
+//   r := async.New(func() async.R {
 //          // do something
-//          return runner.Done()
+//          return async.Done()
 //		    })
 //
 // In this example the func() will be executed asynchronous and r will become resolved when both
@@ -75,21 +75,35 @@ func (R) Type() reflect.Type {
 }
 
 // NewR allocates a new result.
-func NewR(runner Runner) (R, S) {
-	r, s := runner.NewResultT()
+func NewR() (R, S) {
+	r, s := NewBase()
 	return R{r}, S{s}
 }
 
+// Func is a function that initiates a new computation.  It returns an associated result that is
+// resolved when the new computation has completed.
+type Func func() R
+
+// New creates a new asynchronous computation and returns its associated result.
+func New(f Func) R {
+	return GetCurrentRunner().New(f)
+}
+
+// Done returns an unassociated already successfully completed void result.
+func Done() R {
+	return GetCurrentRunner().Done()
+}
+
 // NewError returns an unassociated already failed result.
-func NewError(runner Runner, err error) R {
-	r, s := NewR(runner)
+func NewError(err error) R {
+	r, s := NewR()
 	s.Fail(err)
 	return r
 }
 
 // NewErrorf returns an unassociated already failed result.
-func NewErrorf(runner Runner, format string, a ...interface{}) R {
-	return NewError(runner, fmt.Errorf(format, a...))
+func NewErrorf(format string, a ...interface{}) R {
+	return NewError(fmt.Errorf(format, a...))
 }
 
 // When implements AwaitableT.WhenT().

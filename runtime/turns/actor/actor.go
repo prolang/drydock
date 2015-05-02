@@ -25,19 +25,21 @@ import (
 // RunActor starts a contained environment with a turn manager that runs to completion.
 // main is the initial turn to be executed and the manager continues execution until main's return
 // value is resolved.
-func RunActor(root func(async.Runner) async.R) error {
+func RunActor(root async.Func) error {
 	done := make(chan error, 1)
 
 	go func() {
 		manager := turns.NewManager(turns.NewUniqueIDGenerator())
 		runner := turns.NewTurnRunner(manager)
+		tlsRelease := async.SetAmbientRunner(runner)
+		defer tlsRelease()
 
 		// Allocate a resolver to track the completion of the "main" function.
-		r, s := async.NewR(runner)
+		r, s := async.NewR()
 
-		// Queue to main routine for execution with the main runner as its runner.
+		// Queue to main routine for execution.
 		manager.NewTurn("Main", func() {
-			async.When(root(runner), func(err error) {
+			async.When(root(), func(err error) {
 				log.Infof("Actor Completed with status: %v", err)
 
 				s.Resolve(err)
