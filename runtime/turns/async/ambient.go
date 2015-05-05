@@ -18,7 +18,6 @@ package async
 import (
 	"runtime"
 	"sync"
-	"syscall"
 
 	"github.com/prolang/drydock/runtime/base/assert"
 )
@@ -32,7 +31,7 @@ type ReleaseFunc func()
 // REQUIRES: the caller must call the returned ReleaseFunc to destroy the per-thread context.
 func SetAmbientRunner(runner Runner) ReleaseFunc {
 	runtime.LockOSThread()
-	tid := syscall.Gettid()
+	tid := gettid()
 	threadContextLock.Lock()
 	threadContexts[tid] = threadContext{
 		runner: runner,
@@ -45,7 +44,7 @@ func SetAmbientRunner(runner Runner) ReleaseFunc {
 
 // GetCurrentRunner returns the current ambient (default) runner.
 func GetCurrentRunner() Runner {
-	tid := syscall.Gettid()
+	tid := gettid()
 	threadContextLock.RLock()
 	runner := threadContexts[tid].runner
 	threadContextLock.RUnlock()
