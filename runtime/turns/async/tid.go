@@ -23,4 +23,5 @@ import (
 
 func gettid() int {
 	tid := syscall.Gettid()
+	return tid
 }

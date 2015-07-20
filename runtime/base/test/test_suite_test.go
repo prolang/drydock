@@ -32,7 +32,7 @@ func TestTestSuite(t *testing.T) {
 
 // GetFileLine verify returns the correct file and line number information.
 func (t *SuiteSuite) GetFileLine() {
-	expected := "github.com/prolang/drydock/runtime/base/test/test_suite_test.go:39"
+	expected := "drydock/runtime/base/test/test_suite_test.go:39"
 	wrapper := func() string {
 		return t.getFileLine()
 	}
